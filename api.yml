@@ -1,0 +1,181 @@
+# This is the OpenAPI specification for your service. It is used to generate the client code.
+# To generate the server code, use the Gradle task `openApiGenerate`. The 
+# generated code will be placed in `build/generate-resources/main`.
+#
+# We will evaluate you based on how well you design your API.
+# 1. How well it follows REST principles.
+# 2. How easy it is to understand and use.
+#
+# References
+# 1. https://swagger.io/specification/
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: User Service
+  license:
+    name: MIT
+servers:
+  - url: http://localhost
+paths:
+  /register:
+    post:
+      summary: register a user 
+      operationId: register
+      requestBody:
+        description: User details
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"      
+      responses:
+        '200':
+          description: Registered successfully
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /login:
+    post:
+      summary: login a user
+      operationId: login
+      requestBody:
+        description: User credentials
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                phoneNumber:
+                  type: string
+                password:
+                  type: string
+                  minLength: 6
+              required:
+                - phoneNumber
+                - password
+      responses:
+        '200':
+          description: Logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /user/my-profile:
+    get:
+      summary: get my profile
+      operationId: getMyProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyProfileResponse"
+        '403':
+          description: ForbiddenCode
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      summary: update my profile
+      operationId: updateMyProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: User details
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                phoneNumber:
+                  type: string
+                fullName:
+                  type: string
+      responses:
+        '200':
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyProfileResponse"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+        fullName:
+          type: string
+        password:
+          type: string
+          minLength: 6
+      required:
+        - phoneNumber
+        - fullName
+        - password
+    RegisterResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+    LoginResponse:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+    MyProfileResponse:
+      type: object
+      required:
+        - phoneNumber
+        - fullName
+      properties:
+        phoneNumber:
+          type: string
+        fullName:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
